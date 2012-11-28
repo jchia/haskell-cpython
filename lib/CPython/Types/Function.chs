@@ -26,8 +26,8 @@ module CPython.Types.Function
 	, setDefaults
 	, getClosure
 	, setClosure
-	, getAnnotations
-	, setAnnotations
+--	, getAnnotations
+--	, setAnnotations
 	) where
 
 #include <hscpython-shim.h>
@@ -111,12 +111,12 @@ peekNullableObject = maybePeek peekObject
 
 -- | Return the annotations for a function. This can be a mutable dictionary,
 -- or 'Nothing'.
-{# fun PyFunction_GetAnnotations as getAnnotations
-	{ withObject* `Function'
-	} -> `Maybe Dictionary' peekNullableObject* #}
+-- {# fun PyFunction_GetAnnotations as getAnnotations
+-- 	{ withObject* `Function'
+-- 	} -> `Maybe Dictionary' peekNullableObject* #}
 
 -- | Set the annotations for a function object.
-{# fun PyFunction_SetAnnotations as setAnnotations
-	{ withObject* `Function'
-	, withNullableObject* `Maybe Dictionary'
-	} -> `()' checkStatusCode* #}
+-- {# fun PyFunction_SetAnnotations as setAnnotations
+-- 	{ withObject* `Function'
+-- 	, withNullableObject* `Maybe Dictionary'
+-- 	} -> `()' checkStatusCode* #}

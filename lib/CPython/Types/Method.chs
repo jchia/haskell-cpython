@@ -40,7 +40,7 @@ instance Concrete Method where
 {# fun pure unsafe hscpython_PyMethod_Type as methodType
 	{} -> `Type' peekStaticObject* #}
 
-{# fun PyMethod_New as new
+{# fun hscpython_PyMethod_New as new
 	`(Object func, Object self)' =>
 	{ withObject* `func'
 	, withObject* `self'

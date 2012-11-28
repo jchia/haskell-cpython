@@ -1,5 +1,5 @@
 name: cpython
-version: 3.5.2
+version: 2.7
 license: GPL-3
 license-file: license.txt
 author: John Millikin <jmillikin@gmail.com>
@@ -25,7 +25,7 @@ source-repository head
 source-repository this
   type: git
   location: https://john-millikin.com/code/haskell-cpython/
-  tag: haskell-cpython_3.5.2
+  tag: haskell-cpython_2.7
 
 library
   ghc-options: -Wall -O2 -fno-warn-orphans
@@ -53,7 +53,6 @@ library
     CPython.Types.Exception
     CPython.Types.Float
     CPython.Types.Function
-    CPython.Types.InstanceMethod
     CPython.Types.Integer
     CPython.Types.Iterator
     CPython.Types.List
@@ -81,4 +80,4 @@ library
   c-sources: cbits/hscpython-shim.c
   include-dirs: cbits
 
-  pkgconfig-depends: python-3.5
+  pkgconfig-depends: python-2.7

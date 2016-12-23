@@ -1,0 +1,7 @@
+resolver: lts-7.14
+
+packages:
+- '.'
+- tests/
+
+extra-deps: []

@@ -166,10 +166,10 @@ endInterpreter (ThreadState ptr) =
 
 -- | Return the program name set with 'setProgramName', or the default.
 getProgramName :: IO Text
-getProgramName = pyGetProgramName >>= peekTextW
+getProgramName = pyGetProgramName >>= peekText
 
 foreign import ccall safe "hscpython-shim.h Py_GetProgramName"
-	pyGetProgramName :: IO CWString
+	pyGetProgramName :: IO CString
 
 -- | This computation should be called before 'initialize' is called for the
 -- first time, if it is called at all. It tells the interpreter the value of
@@ -179,10 +179,10 @@ foreign import ccall safe "hscpython-shim.h Py_GetProgramName"
 -- value is @\"python\"@. No code in the Python interpreter will change the
 -- program name.
 setProgramName :: Text -> IO ()
-setProgramName name = withTextW name cSetProgramName
+setProgramName name = withText name cSetProgramName
 
 foreign import ccall safe "hscpython-shim.h hscpython_SetProgramName"
-	cSetProgramName :: CWString -> IO ()
+	cSetProgramName :: CString -> IO ()
 
 -- | Return the prefix for installed platform-independent files. This is
 -- derived through a number of complicated rules from the program name set
@@ -193,10 +193,10 @@ foreign import ccall safe "hscpython-shim.h hscpython_SetProgramName"
 -- at build time. The value is available to Python code as @sys.prefix@. It
 -- is only useful on UNIX. See also 'getExecPrefix'.
 getPrefix :: IO Text
-getPrefix = pyGetPrefix >>= peekTextW
+getPrefix = pyGetPrefix >>= peekText
 
 foreign import ccall safe "hscpython-shim.h Py_GetPrefix"
-	pyGetPrefix :: IO CWString
+	pyGetPrefix :: IO CString
 
 -- | Return the /exec-prefix/ for installed platform-/dependent/ files. This
 -- is derived through a number of complicated rules from the program name
@@ -229,20 +229,20 @@ foreign import ccall safe "hscpython-shim.h Py_GetPrefix"
 -- programs to share @\/usr\/local@ between platforms while having
 -- @\/usr\/local\/plat@ be a different filesystem for each platform.
 getExecPrefix :: IO Text
-getExecPrefix = pyGetExecPrefix >>= peekTextW
+getExecPrefix = pyGetExecPrefix >>= peekText
 
 foreign import ccall safe "hscpython-shim.h Py_GetExecPrefix"
-	pyGetExecPrefix :: IO CWString
+	pyGetExecPrefix :: IO CString
 
 -- | Return the full program name of the Python executable; this is computed
 -- as a side-effect of deriving the default module search path from the
 -- program name (set by 'setProgramName' above). The value is available to
 -- Python code as @sys.executable@.
 getProgramFullPath :: IO Text
-getProgramFullPath = pyGetProgramFullPath >>= peekTextW
+getProgramFullPath = pyGetProgramFullPath >>= peekText
 
 foreign import ccall safe "hscpython-shim.h Py_GetProgramFullPath"
-	pyGetProgramFullPath :: IO CWString
+	pyGetProgramFullPath :: IO CString
 
 -- | Return the default module search path; this is computed from the
 -- program name (set by 'setProgramName' above) and some environment
@@ -252,10 +252,10 @@ foreign import ccall safe "hscpython-shim.h Py_GetProgramFullPath"
 -- is available to Python code as the list @sys.path@, which may be modified
 -- to change the future search path for loaded modules.
 getPath :: IO Text
-getPath = pyGetPath >>= peekTextW
+getPath = pyGetPath >>= peekText
 
 foreign import ccall safe "hscpython-shim.h Py_GetPath"
-	pyGetPath :: IO CWString
+	pyGetPath :: IO CString
 
 -- | Return the version of this Python interpreter. This is a string that
 -- looks something like
@@ -327,28 +327,28 @@ foreign import ccall safe "hscpython-shim.h Py_GetPath"
 -- or just the interactive interpreter), the empty string is used instead.
 setArgv :: Text -> [Text] -> IO ()
 setArgv argv0 argv =
-	mapWith withTextW (argv0 : argv) $ \textPtrs ->
+	mapWith withText (argv0 : argv) $ \textPtrs ->
 	let argc = fromIntegral $ length textPtrs in
 	withArray textPtrs $ pySetArgv argc
 
 foreign import ccall safe "hscpython-shim.h PySys_SetArgv"
-	pySetArgv :: CInt -> Ptr CWString -> IO ()
+	pySetArgv :: CInt -> Ptr CString -> IO ()
 
 -- | Return the default &#x201c;home&#x201d;, that is, the value set by a
 -- previous call to 'setPythonHome', or the value of the @PYTHONHOME@
 -- environment variable if it is set.
 getPythonHome :: IO (Maybe Text)
-getPythonHome = pyGetPythonHome >>= peekMaybeTextW
+getPythonHome = pyGetPythonHome >>= peekMaybeText
 
 foreign import ccall safe "hscpython-shim.h Py_GetPythonHome"
-	pyGetPythonHome :: IO CWString
+	pyGetPythonHome :: IO CString
 
 -- | Set the default &#x201c;home&#x201d; directory, that is, the location
 -- of the standard Python libraries. The libraries are searched in
 -- @/home/\/lib\//python version/@ and @/home/\/lib\//python version/@. No
 -- code in the Python interpreter will change the Python home.
 setPythonHome :: Maybe Text -> IO ()
-setPythonHome name = withMaybeTextW name cSetPythonHome
+setPythonHome name = withMaybeText name cSetPythonHome
 
 foreign import ccall safe "hscpython-shim.h hscpython_SetPythonHome"
-	cSetPythonHome :: CWString -> IO ()
+	cSetPythonHome :: CString -> IO ()

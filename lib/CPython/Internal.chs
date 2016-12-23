@@ -26,9 +26,11 @@ module CPython.Internal
 	, cFromBool
 	, peekText
 	, peekTextW
+	, peekMaybeText
 	, peekMaybeTextW
 	, withText
 	, withTextW
+	, withMaybeText
 	, withMaybeTextW
 	, mapWith
 	, unsafePerformIO
@@ -98,6 +100,9 @@ peekText = fmap T.pack . peekCString
 peekTextW :: CWString -> IO T.Text
 peekTextW = fmap T.pack . peekCWString
 
+peekMaybeText :: CString -> IO (Maybe T.Text)
+peekMaybeText = maybePeek peekText
+
 peekMaybeTextW :: CWString -> IO (Maybe T.Text)
 peekMaybeTextW = maybePeek peekTextW
 
@@ -106,6 +111,9 @@ withText = withCString . T.unpack
 
 withTextW :: T.Text -> (CWString -> IO a) -> IO a
 withTextW = withCWString . T.unpack
+
+withMaybeText :: Maybe T.Text -> (CString -> IO a) -> IO a
+withMaybeText = maybeWith withText
 
 withMaybeTextW :: Maybe T.Text -> (CWString -> IO a) -> IO a
 withMaybeTextW = maybeWith withTextW

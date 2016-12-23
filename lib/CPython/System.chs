@@ -61,16 +61,16 @@ deleteObject name =
 
 -- | Add an entry to @sys.warnoptions@.
 addWarnOption :: Text -> IO ()
-addWarnOption str = withTextW str pySysAddWarnOption
+addWarnOption str = withText str pySysAddWarnOption
 
 foreign import ccall safe "hscpython-shim.h PySys_AddWarnOption"
-	pySysAddWarnOption :: CWString -> IO ()
+	pySysAddWarnOption :: CString -> IO ()
 
 -- | Set @sys.path@ to a list object of paths found in the parameter, which
 -- should be a list of paths separated with the platform's search path
 -- delimiter (@\':\'@ on Unix, @\';\'@ on Windows).
 setPath :: Text -> IO ()
-setPath path = withTextW path pySysSetPath
+setPath path = withText path pySysSetPath
 
 foreign import ccall safe "hscpython-shim.h PySys_SetPath"
-	pySysSetPath :: CWString -> IO ()
+	pySysSetPath :: CString -> IO ()

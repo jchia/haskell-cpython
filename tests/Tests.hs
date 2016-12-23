@@ -31,8 +31,9 @@ import           CPython.Types.Module
 
 suite_ProgramProperties :: Suite
 suite_ProgramProperties = suite "program-properties"
-	test_ProgramName
-	test_PythonHome
+	[ test_ProgramName
+	, test_PythonHome
+	]
 
 test_ProgramName :: Test
 test_ProgramName = assertions "program-name" $ do
@@ -54,24 +55,21 @@ test_PythonHome = assertions "python-home" $ do
 	do
 		defaultHome <- liftIO getPythonHome
 		$expect (equal defaultHome Nothing)
-	
+
 	do
 		liftIO (setPythonHome (Just "/python/home"))
 		newHome <- liftIO getPythonHome
 		$expect (equal newHome (Just "/python/home"))
-	
+
 	do
 		liftIO (setPythonHome Nothing)
 		newHome <- liftIO getPythonHome
 		$expect (equal newHome Nothing)
 
-suite_Types :: Suite
-suite_Types = suite "types"
-	suite_Module
-
 suite_Module :: Suite
 suite_Module = suite "module"
-	test_ImportModule
+	[ test_ImportModule
+	]
 
 test_ImportModule :: Test
 test_ImportModule = assertions "importModule" $ do
@@ -81,7 +79,7 @@ test_ImportModule = assertions "importModule" $ do
 tests :: [Suite]
 tests =
 	[ suite_ProgramProperties
-	, suite_Types
+	, suite_Module
 	]
 
 main :: IO ()

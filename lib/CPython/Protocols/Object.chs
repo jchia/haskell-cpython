@@ -61,6 +61,7 @@ module CPython.Protocols.Object
 
 import           Prelude hiding (Ordering (..), print)
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import           System.IO (Handle, hPutStrLn)
 
 import           CPython.Internal hiding (toBool)
@@ -183,14 +184,17 @@ cast obj = do
 
 -- | Print @repr(self)@ to a handle.
 print :: Object self => self -> Handle -> IO ()
-print obj h = repr obj >>= U.fromUnicode >>= (hPutStrLn h . T.unpack)
+print obj h = do
+	r <- repr obj
+	ru <- T.decodeLatin1 <$> B.fromBytes r
+	(hPutStrLn h . T.unpack) ru
 
 -- | Compute a string representation of object /self/, or throw an exception
 -- on failure. This is the equivalent of the Python expression @repr(self)@.
 {# fun PyObject_Repr as repr
 	`Object self' =>
 	{ withObject* `self'
-	} -> `U.Unicode' stealObject* #}
+	} -> `B.Bytes' stealObject* #} -- Python 2
 
 -- \ As 'ascii', compute a string representation of object /self/, but escape
 -- the non-ASCII characters in the string returned by 'repr' with @\x@, @\u@

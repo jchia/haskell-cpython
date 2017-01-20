@@ -184,6 +184,10 @@ cast obj = do
 
 -- | Print @repr(self)@ to a handle.
 print :: Object self => self -> Handle -> IO ()
+-- TODO It seems wrong that this uses `repr()` as the docs at
+--        https://docs.python.org/3/c-api/object.html#c.PyObject_Str
+--        https://docs.python.org/2/c-api/object.html#c.PyObject_Str
+--      clearly say that `print()` uses `str()`.
 print obj h = do
 	r <- repr obj
 	ru <- T.decodeLatin1 <$> B.fromBytes r

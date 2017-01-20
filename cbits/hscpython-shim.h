@@ -90,4 +90,5 @@ PyObject *hscpython_PyMapping_Values(PyObject *);
 PyObject *hscpython_PyMapping_Keys(PyObject *);
 PyObject *hscpython_PyObject_Bytes(PyObject *);
 
+int hscpython_PyObject_Print_stderr(PyObject *o);
 #endif

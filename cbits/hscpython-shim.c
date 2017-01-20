@@ -281,3 +281,6 @@ PyObject *hscpython_PyMapping_Keys(PyObject *o)
 
 PyObject *hscpython_PyObject_Bytes(PyObject *o)
 { return PyObject_Bytes(o); }
+
+int hscpython_PyObject_Print_stderr(PyObject *o)
+{ return PyObject_Print(o, stderr, 0); }

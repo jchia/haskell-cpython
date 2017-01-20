@@ -35,6 +35,7 @@ module CPython.Protocols.Object
 
 	-- * Display and debugging
 	, print
+	, debugPyPrintStderr
 	, repr
 --	, ascii
 	, string
@@ -163,6 +164,21 @@ cast obj = do
 	`Object self' =>
 	{ withObject* `self'
 	, withObject* `U.Unicode'
+	} -> `()' checkStatusCode* #}
+
+-- | For debugging only!
+--
+-- Prints a Python object to err using Python's `print` function.
+--
+-- It is only useful for debugging because it doesn't print a newline after
+-- the string, and because in general Haskell Handles and Python handles
+-- may have independent buffers, which can result in confusingly interleaved
+-- or held-back output.
+-- For stderr it usually works because stderr it typically unbuffered,
+-- but that's only a default and cannot be relied upon.
+{# fun hscpython_PyObject_Print_stderr as debugPyPrintStderr
+	`Object self' =>
+	{ withObject* `self'
 	} -> `()' checkStatusCode* #}
 
 -- | Print @repr(self)@ to a handle.

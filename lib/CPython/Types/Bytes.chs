@@ -34,6 +34,7 @@ import qualified Data.ByteString.Unsafe as B
 import           CPython.Internal
 
 newtype Bytes = Bytes (ForeignPtr Bytes)
+	deriving (Show)
 
 instance Object Bytes where
 	toObject (Bytes x) = SomeObject x

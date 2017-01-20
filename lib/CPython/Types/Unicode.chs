@@ -62,6 +62,7 @@ import           CPython.Internal
 import           CPython.Types.Bytes (Bytes)
 
 newtype Unicode = Unicode (ForeignPtr Unicode)
+	deriving (Show)
 
 instance Object Unicode where
 	toObject (Unicode x) = SomeObject x

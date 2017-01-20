@@ -82,6 +82,7 @@ module CPython.Internal
 
 import           Control.Applicative ((<$>))
 import qualified Control.Exception as E
+import           Control.Monad (when)
 import qualified Data.Text as T
 import           Data.Typeable (Typeable)
 import           Foreign hiding (unsafePerformIO)
@@ -197,7 +198,7 @@ unsafeCast a = case toObject a of
 
 data Exception = Exception
 	{ exceptionType      :: SomeObject
-	, exceptionValue     :: SomeObject
+	, exceptionValue     :: Maybe SomeObject
 	, exceptionTraceback :: Maybe SomeObject
 	}
 	deriving (Typeable)
@@ -210,15 +211,46 @@ instance E.Exception Exception
 exceptionIf :: Bool -> IO ()
 exceptionIf False = return ()
 exceptionIf True =
-	alloca $ \pType ->
-	alloca $ \pValue ->
-	alloca $ \pTrace -> do
-		{# call PyErr_Fetch as ^ #} pType pValue pTrace
-		{# call PyErr_NormalizeException as ^ #} pType pValue pTrace
-		eType <- unsafeStealObject =<< peek pType
-		eValue <- unsafeStealObject =<< peek pValue
-		eTrace <- maybePeek unsafeStealObject =<< peek pTrace
-		E.throwIO $ Exception eType eValue eTrace
+	alloca $ \ppType ->
+	alloca $ \ppValue ->
+	alloca $ \ppTrace -> do
+		occurredPtr <- {# call PyErr_Occurred as ^ #}
+		if (occurredPtr == nullPtr)
+			then error "Haskell cpython library BUG: exceptionIf was called but there is no Python error indicator"
+			else do
+				{# call PyErr_Fetch as ^ #} ppType ppValue ppTrace
+				{# call PyErr_NormalizeException as ^ #} ppType ppValue ppTrace
+				pType <- peek ppType
+				pValue <- peek ppValue
+				pTrace <- peek ppTrace
+
+				-- For debugging exceptions inside the binding.
+				-- When we use this, we need to increment references to the error
+				-- indicator values, because PyErr_Restore will take one set of
+				-- references away from us, and we have to call it for PyErr_PrintEx
+				-- to work.
+				let debugPrintStacktraceHere = True
+
+				when debugPrintStacktraceHere $ do
+					incref pType
+					when (pValue /= nullPtr) (incref pValue)
+					when (pTrace /= nullPtr) (incref pTrace)
+
+				eType <- unsafeStealObject pType
+				-- From the docs of `PyErr_Fetch`
+				--   The value and traceback object may be NULL even when the type object is not.
+				-- So both eValue and eTrace must be Maybes.
+				-- See
+				--   https://docs.python.org/3/c-api/exceptions.html
+				--   https://docs.python.org/2/c-api/exceptions.html#c.PyErr_Fetch
+				eValue <- maybePeek unsafeStealObject pValue
+				eTrace <- maybePeek unsafeStealObject pTrace
+
+				when debugPrintStacktraceHere $ do
+					{# call PyErr_Restore as ^ #} pType pValue pTrace
+					{# call PyErr_PrintEx as ^ #} 0
+
+				E.throwIO $ Exception eType eValue eTrace
 
 checkStatusCode :: CInt -> IO ()
 checkStatusCode = exceptionIf . (== -1)

@@ -1,7 +1,8 @@
-resolver: lts-7.14
+resolver: lts-10.0
 
 packages:
 - '.'
 - tests/
 
-extra-deps: []
+extra-deps:
+- chell-0.4.0.2
